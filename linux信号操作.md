@@ -229,4 +229,70 @@ int main()
 
     程序编译运行后，在终端按下Ctrl+C和Ctrl+Z后，应用程序不反应，说明我们阻塞了SIGINT和SIGTSTP信号。
 
+## 等待信号
+
+### 使用`pause`等待信号
+
+`pause`会挂起当前进程，直到一个信号到来。下面演示一个例子。
+
+```cpp
+// filename: pause_demo.c
+#include <unistd.h>
+#include <stdio.h>
+#include <signal.h>
+
+void int_handler(int sig_num)
+{
+}
+
+int main()
+{
+    signal(SIGINT,int_handler);
+    pause();
+    printf("hello world\n");
+    return 0;
+}
+```
+
+编译运行程序后，程序不会退出，按下`Ctrl+C`发送`SIGINT`，然后程序打印`hello world`后退出。
+
+### 使用`sigsuspend`函数等待信号
+
+与`pause`不同的是，`pause`会等待任意信号，而`sigsuspend`等待指定类型的信号。
+
+```cpp
+// filename: sigsuspend_demo.c
+#include <unistd.h>
+#include <stdio.h>
+#include <signal.h>
+
+void my_handler(int sig_num)
+{
+    printf("%d sig\n",sig_num);
+}
+
+int main()
+{
+    sigset_t mask;
+    
+    sigfillset(&mask);
+    sigdelset(&mask, SIGINT);
+    sigdelset(&mask, SIGTSTP);
+
+    signal(SIGINT, my_handler);
+    signal(SIGTSTP,my_handler);
+    signal(60,my_handler);
+    
+    sigsuspend(&mask);
+
+    printf("hello world\n");
+    return 0;
+}
+```
+
+编译运行，使用`kill`分别发送`60`、`SIGINT`，发送`60`的时候程序没反应（因为已经被挂起），发送`SIGINT`的时候，程序恢复执行，并且之前的`60`信号也被执行（其实早已经执行，但是当前进程被挂起，所以看不到输出）。
+
+`sigsuspend`函数相当于将`mask`中标记的信号全部阻塞，然后调用`pause`，然后调用`pause`，等待到信号后，再回复现场。
+
+
 本文章简单地讨论了`linux`下信号的使用，但是还有很多没有提到的细节，而且例子也大多不规范（只为了说明问题），更多细节请参考官方的文档或者更权威的书籍。
