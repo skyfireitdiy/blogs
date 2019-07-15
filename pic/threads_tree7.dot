@@ -1,0 +1,13 @@
+digraph G {
+    9->3
+    9->12
+    3->2
+    3->8
+    12->10
+    12->15
+    2->3[style=dashed, color="green"]
+    8->9[style=dashed, color="green"]
+    10->12[style=dashed, color="green"]
+    
+    10[style=filled, color=purple]
+}
