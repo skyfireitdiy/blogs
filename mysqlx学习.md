@@ -79,7 +79,84 @@ int main() {
 
 下面注释的部分应用于确定已存在Schema的情况，第二个参数意义为是否立即检查Schema的存在性。
 
-## 创建/获取集合
+## 表存储（SQL）
+
+在数据库创建一个表：
+
+```SQL
+CREATE TABLE test.student(
+    name VARCHAR(32),
+    age INT,
+    address VARCHAR(64)
+);
+```
+
+### 获取表
+
+```cpp
+int main() {
+    std::string conf = "mysqlx://root:root@127.0.0.1:33060";
+    mysqlx::Session mysql_session(conf);
+
+    auto schema = mysql_session.createSchema("test", true);
+    // auto schema = mysql_session.getSchema("test", true);
+
+    auto table = schema.getTable("student", true);
+}
+```
+
+`getTable` 可以获取一张表，第二个参数代表是否检测表的存在性。
+
+### CRUD 操作
+
+```cpp
+#include <mysqlx/xdevapi.h>
+#include <iostream>
+
+
+int main() {
+    std::string conf = "mysqlx://root:root@127.0.0.1:33060";
+    mysqlx::Session mysql_session(conf);
+
+    auto schema = mysql_session.createSchema("test", true);
+    // auto schema = mysql_session.getSchema("test", true);
+
+    auto table = schema.getTable("student", true);
+
+    // remove all
+    table.remove().execute();
+
+    auto show_all_data = [&]{
+        auto result = table.select().execute();
+        auto data = result.fetchAll();
+        for (auto d: data){
+            std::cout<<"name:"<<d.get(0)<<" age:"<<d.get(1)<<" address:"<<d.get(2)<<std::endl;
+        }
+        std::cout<<"================="<<std::endl;
+    };
+
+    // insert into test.student values('skyfire', 26, "Xi'an");
+    table.insert().values("skyfire", 26, "Xi'an").execute();
+    // insert into test.student(age, address, name) values(28, 'beijing', 'zhangsan');
+    table.insert("age", "address", "name").values(28, "beijing", "zhangsan").execute();
+
+    show_all_data();
+
+    // update test.student set name='lisi' where name='zhangsan';
+    table.update().set("name", "lisi").where("name = 'zhangsan'").execute();
+
+    show_all_data();
+
+    // delete from test.student where name = 'skyfire';
+    table.remove().where("name = 'skyfire'").execute();
+
+    show_all_data();
+}
+```
+
+## 文档存储（NoSql）
+
+### 创建/获取集合
 
 ```cpp
 #include <mysqlx/xdevapi.h>
@@ -98,7 +175,7 @@ int main() {
 
 在Schema上创建一个集合，getCollection 函数与 createCollection 函数的区别与Schema相关函数类似，不再赘述。
 
-## CRUD 操作
+### CRUD 操作
 
 mysqlx 对文档的操作很友好，大致看一下就明白含义了。
 
