@@ -36,6 +36,37 @@ Subprocess pid: 11284 4950
 
 上面程序中，sum 运行在子进程中。
 
+
+## 进程池
+
+```Python
+from multiprocessing import Pool
+import os
+import time
+
+
+def func(start, end, n):
+    for i in range(start, end):
+        time.sleep(1)
+        print(n, i)
+
+
+def main():
+    p = Pool(4)
+    for i in range(10):
+        p.apply_async(func, (i*10, (i+1) * 10, i))
+    p.close()
+    p.join()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+对 Pool 对象调用 join() 方法会等待所有子进程执行完毕，调用join()之前必须先调用 close() ，调用 close() 之后就不能继续添加新的 Process 了。
+
+在上一个程序中，允许最多同时运行 4 个进程。
+
 ## 多进程通信
 
 如果需要多个进程进行通信，可以借助 Queue。
