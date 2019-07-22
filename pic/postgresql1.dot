@@ -1,0 +1,15 @@
+digraph{
+    subgraph cluster_0{
+        label="数据库"
+        subgraph cluster_00{
+            style=dashed
+            label = "Schema"
+            数据表1[label="数据表"]
+        }
+        subgraph cluster_01{
+            style=dashed
+            label = "Schema"
+            数据表2[label="数据表"]
+        }
+    }
+}
